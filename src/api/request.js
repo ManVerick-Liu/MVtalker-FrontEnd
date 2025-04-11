@@ -3,12 +3,11 @@
 import axios from 'axios'
 
 axios.defaults.baseURL = '/api';
+// axios.defaults.baseURL = 'http://mk-api.cavalry.gx.cn';
 axios.defaults.timeout = 5000;
-// axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 axios.defaults.headers.post['Content-Type'] = 'application/json';
-// axios.defaults.withCredentials = true;
 // 设定请求头TOKEN
-axios.defaults.headers.common['Authorization'] = localStorage.getItem('token');
+axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
 
 
 export const instance = axios.create({});
@@ -28,10 +27,26 @@ instance.interceptors.request.use(
 // 响应拦截
 instance.interceptors.response.use(
     response => {
-        console.log(response);
-        if (response.data.data.token !== null || response.data.data.token !== '' || response.data.data.token !== undefined) {
+        // console.log(response);
+        // console.log(response.request)
+        if (response.request.responseURL.includes('/user/login') || response.request.responseURL.includes('/user/register')){
             console.log('token', response.data.data.token);
-            localStorage.setItem('token',`Bearer ${response.data.data.token}`);
+            localStorage.setItem('token', response.data.data.token);
+            localStorage.setItem('userInfo',JSON.stringify(response.data.data.userInfo));
+            localStorage.setItem('userStatus',JSON.stringify(response.data.data.userStatus));
+            localStorage.setItem('userGlobalVolume',JSON.stringify(response.data.data.userGlobalVolume));
+        }
+        else if (response.request.responseURL.includes('get-user-info-by-user-id')){
+            localStorage.setItem('userInfo',JSON.stringify(response.data.data.userInfo));
+        }
+        else if (response.request.responseURL.includes('get-user-status-by-user-id')){
+            localStorage.setItem('userStatus',JSON.stringify(response.data.data.userStatus));
+        }
+        else if (response.request.responseURL.includes('/user/offline')){
+            localStorage.removeItem('token');
+            localStorage.removeItem('userInfo');
+            localStorage.removeItem('userStatus');
+            localStorage.removeItem('userGlobalVolume');
         }
         return response;
     },

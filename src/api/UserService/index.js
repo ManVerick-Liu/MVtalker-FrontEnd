@@ -47,3 +47,37 @@ export const userOffline = () => {
         });
     });
 };
+
+/**
+ * 获取当前用户信息
+ * @returns {Promise<unknown>}
+ */
+export const getUserInfo = () => {
+    return new Promise((resolve, reject) => {
+        instance({
+            url: '/user/get-user-info-by-user-id',
+            method: 'get'
+        }).then(res => {
+            resolve(res);
+        }).catch(err => {
+            reject(err);
+        });
+    });
+};
+
+/**
+ * 获取当前用户状态
+ * @returns {Promise<unknown>}
+ */
+export const getUserStatus = () => {
+    return new Promise((resolve, reject) => {
+        instance({
+            url: '/user/get-user-status-by-user-id',
+            method: 'get'
+        }).then(res => {
+            resolve(res);
+        }).catch(err => {
+            reject(err);
+        });
+    });
+};

@@ -1,5 +1,8 @@
 <template>
   <div class="auth-container">
+    <audio id="music" autoplay loop>
+      <source :src="audio" type="audio/mpeg"></source>
+    </audio>
     <div class="auth-card">
       <div class="toggle-buttons">
         <button :class="{ active: isLogin }" @click="isLogin = true">登录</button>
@@ -52,10 +55,11 @@
 </template>
 
 <script setup>
-import {nextTick, onMounted, reactive, ref} from 'vue'
-import Rex from '../utils/rex'
+import {nextTick, onMounted, reactive, ref} from 'vue';
+import Rex from '../utils/rex';
 import {register, login, userOffline} from "../api/UserService";
-import {useRouter} from  "vue-router"
+import {useRouter} from  "vue-router";
+import audio from "@/assets/SoundHelix-Song-1.mp3"
 
 const isLogin = ref(true)
 const form = reactive({
@@ -116,9 +120,9 @@ function handleSubmit() {
       };
       // 校验通过发送请求接口
       register(payload).then(res => {
-        console.log(res.data.token);
-        localStorage.setItem('token', res.data.token);
-        console.log(res);
+        if (res.status === 200){
+          router.push('/');
+        }
       }).catch(err => {
         console.log(err);
       });
@@ -209,8 +213,8 @@ const validateInput = (field, value, type, regionCode = '') => {
 onMounted(()=>{
   nextTick(()=>{
     userOffline().then((res) => {
-     const message = res.data.message;
-     alert(message);
+     // const message = res.data.message;
+     // alert(message);
     })
   });
 });
