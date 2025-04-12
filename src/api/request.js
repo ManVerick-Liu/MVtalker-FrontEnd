@@ -42,12 +42,12 @@ instance.interceptors.response.use(
         else if (response.request.responseURL.includes('get-user-status-by-user-id')){
             localStorage.setItem('userStatus',JSON.stringify(response.data.data.userStatus));
         }
-        else if (response.request.responseURL.includes('/user/offline')){
-            localStorage.removeItem('token');
-            localStorage.removeItem('userInfo');
-            localStorage.removeItem('userStatus');
-            localStorage.removeItem('userGlobalVolume');
-        }
+        // else if (response.request.responseURL.includes('/user/offline')){
+        //     localStorage.removeItem('token');
+        //     localStorage.removeItem('userInfo');
+        //     localStorage.removeItem('userStatus');
+        //     localStorage.removeItem('userGlobalVolume');
+        // }
         return response;
     },
     error => {

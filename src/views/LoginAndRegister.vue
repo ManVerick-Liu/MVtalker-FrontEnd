@@ -120,7 +120,9 @@ function handleSubmit() {
       };
       // 校验通过发送请求接口
       register(payload).then(res => {
-        if (res.status === 200){
+        console.log('注册响应：',res)
+        // res.status为200系列即可跳转
+        if (res.status >= 200 && res.status < 300){
           router.push('/');
         }
       }).catch(err => {

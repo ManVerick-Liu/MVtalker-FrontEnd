@@ -1,0 +1,20 @@
+{
+  "name": "mvtalker-proxy-websocket",
+  "version": "1.0.0",
+  "description": "MVtalker websocket代理",
+  "main": "index.js",
+  "scripts": {
+    "testServer": "node testServer.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "websocket",
+    "proxy"
+  ],
+  "author": "Cavalry",
+  "license": "ISC",
+  "dependencies": {
+    "ip": "^2.0.1",
+    "ws": "^8.18.1"
+  }
+}

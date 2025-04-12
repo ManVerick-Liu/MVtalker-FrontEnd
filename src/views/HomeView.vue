@@ -4,6 +4,7 @@ import {ref, onMounted, nextTick, watch} from 'vue';
 import {useRouter} from 'vue-router';
 import {connectSignalingServer, onMessage, sendMessageStandard} from '@/api/signalingsocket';
 import {testGetOnlineUserViews} from "@/api/UserService/test";
+import {userOffline} from "@/api/UserService";
 
 const router = useRouter();
 const remoteAudio = ref(null);
@@ -15,6 +16,16 @@ const targetUserId = ref('');
 
 let localStream = null;
 let peerConnection = null;
+
+// 退登录
+const outLogin = async () => {
+   await userOffline().catch((err) => {
+     router.push('/login');
+   });
+  console.log('✅ 退出登录成功');
+  alert('✅ 退出登录成功');
+  await router.push('/login');
+};
 
 // 封装媒体初始化逻辑
 const initLocalAudio = async () => {
@@ -215,7 +226,7 @@ onMounted(async () => {
 
 
 <template>
-  <img @click="router.push({path: '/login', replace: true});" :src="exitIcon" class="exit-img"   alt="exit"/>
+  <img @click="outLogin" :src="exitIcon" class="exit-img"   alt="exit"/>
 
   <!-- 页面模板 -->
   <div class="home">
