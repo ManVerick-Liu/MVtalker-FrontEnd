@@ -1,10 +1,11 @@
 // axios 请求拦截器 + 实例集成
-
 import axios from 'axios'
-
-axios.defaults.baseURL = '/api';
+const baseUrl = import.meta.env.VITE_API_BASE_URL;
+// axios.defaults.baseURL = '/api';
 // axios.defaults.baseURL = 'http://mk-api.cavalry.gx.cn';
-axios.defaults.timeout = 5000;
+console.log('apiBaseUrl', baseUrl);
+axios.defaults.baseURL = baseUrl;
+axios.defaults.timeout = 10000;
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 // 设定请求头TOKEN
 axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('token')}`;

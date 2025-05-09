@@ -1,8 +1,9 @@
 <template>
   <div class="auth-container">
-    <audio id="music" autoplay loop>
+    <audio id="loginMusic" ref="audioRef"  autoplay loop>
       <source :src="audio" type="audio/mpeg"></source>
     </audio>
+    <button class="mute-music" @click="muteLoginMusic">{{muteMusic ? '🔇' : '🔈'}}</button>
     <div class="auth-card">
       <div class="toggle-buttons">
         <button :class="{ active: isLogin }" @click="isLogin = true">登录</button>
@@ -68,13 +69,11 @@ const form = reactive({
   password: '',
   confirm: '',
 });
-
 const selectedRegion = reactive({
   name: '中国',
   code: '+86',
   flag: '🇨🇳'
 })
-
 const regionList = [
   { name: '中国', code: '+86', flag: '🇨🇳' },
   { name: '美国', code: '+1', flag: '🇺🇸' },
@@ -83,7 +82,6 @@ const regionList = [
   { name: '香港', code: '+852', flag: '🇭🇰' },
   { name: '台湾', code: '+886', flag: '🇹🇼' }
 ]
-
 const showRegionList = ref(false);
 const router = useRouter();
 const inputStates = reactive({
@@ -92,6 +90,8 @@ const inputStates = reactive({
   password: { valid: true, placeholder: '请输入密码' },
   confirm: { valid: true, placeholder: '确认密码' },
 });
+const audioRef = ref(null);
+const muteMusic = ref(false);
 
 function selectRegion(region) {
   selectedRegion.name = region.name;
@@ -212,17 +212,34 @@ const validateInput = (field, value, type, regionCode = '') => {
   return isValid;
 }
 
+const muteLoginMusic = () => {
+  muteMusic.value = !muteMusic.value;
+  muteMusic.value ? audioRef.value.pause() : audioRef.value.play();
+}
+
 onMounted(()=>{
   nextTick(()=>{
+    if (audioRef.value) {
+      audioRef.value.volume = 0.1;
+    }
     userOffline().then((res) => {
      // const message = res.data.message;
      // alert(message);
-    })
+    });
   });
 });
 </script>
 
 <style scoped>
+.mute-music {
+  position: absolute;
+  top: 2vw;
+  right: 2vw;
+  cursor: pointer;
+  background: rgb(255, 255, 255, 0);
+  border: 0;
+  font-size: 1.5rem;
+}
 .auth-container {
   display: flex;
   align-items: center;

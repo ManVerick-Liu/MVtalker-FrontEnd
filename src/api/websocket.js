@@ -1,11 +1,11 @@
 
-// signalingsocket.js
+// websocket.js
 import dayjs from "dayjs";
 
 let socket = null;
 
 /**
- * 连接信令服务器
+ * 连接websocket服务器
  * @param {string} serverPath - 既可以是完整地址（如 wss://xxx），也可以是相对路径（如 /webrtc/signaling）
  */
 export function connectSignalingServer(serverPath = '/webrtc/signaling') {
@@ -14,8 +14,8 @@ export function connectSignalingServer(serverPath = '/webrtc/signaling') {
 
     const url = isFullUrl
         ? serverPath
-        : `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}${window.location.host}${serverPath}`;
-
+        : `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}${window.location.hostname}${serverPath}`;
+    console.log('🌐 连接到:', url);
     socket = new WebSocket(url);
 
     socket.onopen = () => {
@@ -27,8 +27,17 @@ export function connectSignalingServer(serverPath = '/webrtc/signaling') {
     };
 
     socket.onmessage = (event) => {
-        console.log("📨 收到消息:", event.data);
+        // console.log("📨 收到消息:", event.data);
+        const eventData = JSON.parse(event.data);
+        console.log(event);
+        console.log("📩 收到消息:", eventData);
         // 可选：解析 JSON 消息并处理
+        // 处理心跳类型
+        if (eventData.type === 'heartbeat'){
+            eventData.data.message = 'PONG';
+            sendMessage('heartbeat', eventData.data);
+        }
+
     };
 
     socket.onerror = (e) => {
@@ -36,12 +45,12 @@ export function connectSignalingServer(serverPath = '/webrtc/signaling') {
     };
 }
 
-// export const  sendMessage = (type, data) => {
-//     if (socket?.readyState === WebSocket.OPEN) {
-//         console.log('✉️ 发送消息:', type, data);
-//         socket.send(JSON.stringify({ type, data }));
-//     }
-// }
+export const  sendMessage = (type, data) => {
+    if (socket?.readyState === WebSocket.OPEN) {
+        console.log('✉️ 发送消息:', type, data);
+        socket.send(JSON.stringify({ type, data }));
+    }
+}
 
 export const sendMessageStandard = (type, payload =
 {
@@ -72,3 +81,4 @@ export const onMessage = ( type, callback) => {
         if (t === type) callback(data);
     });
 }
+

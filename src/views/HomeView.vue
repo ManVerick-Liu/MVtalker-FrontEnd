@@ -2,7 +2,7 @@
 import exitIcon from '@/assets/ic--baseline-exit-to-app.svg';
 import {ref, onMounted, nextTick, watch} from 'vue';
 import {useRouter} from 'vue-router';
-import {connectSignalingServer, onMessage, sendMessageStandard} from '@/api/signalingsocket';
+import {connectSignalingServer, onMessage, sendMessageStandard} from '@/api/websocket';
 import {testGetOnlineUserViews} from "@/api/UserService/test";
 import {userOffline} from "@/api/UserService";
 
@@ -160,7 +160,10 @@ onMounted(async () => {
   const onlineUserRes = await testGetOnlineUserViews();
   targetUserIdList.value = onlineUserRes.data.data.userViews;
 
-  await connectSignalingServer(`ws://192.168.10.4:3000/ws?token=${token}`);
+  // mk-ws.cavalry.gx.cn
+  const baseWebsocketUrl = import.meta.env.VITE_API_PROXY_WEBSOCKET;
+  console.log('🚀 baseWebsocketUrl:', baseWebsocketUrl);
+  await connectSignalingServer(baseWebsocketUrl + `?token=${token}`);
 
   // 📥 被叫方收到 offer
   await onMessage('offer', async (offer) => {

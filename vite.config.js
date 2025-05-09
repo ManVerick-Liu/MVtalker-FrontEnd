@@ -19,6 +19,7 @@ export default defineConfig({
         port: 5173,  // 默认启动端口
         open: true,    // 自动打开浏览器
         hmr: true,
+        cors: true,
         proxy: {
             '/api': {
                 target: 'http://mk-api.cavalry.gx.cn',
