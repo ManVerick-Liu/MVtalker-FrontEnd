@@ -189,7 +189,7 @@ onMounted(async () => {
       clearInterval(intervalUserTimer.value);
     }
 
-  }, 1000);
+  }, 5000);
 
 
   // mk-ws.cavalry.gx.cn
