@@ -27,6 +27,10 @@ const outLogin = async () => {
   console.log('✅ 退出登录成功');
   alert('✅ 退出登录成功');
   await router.push('/login');
+  localStorage.removeItem('token');
+  // localStorage.removeItem('userInfo');
+  // localStorage.removeItem('userStatus');
+  // localStorage.removeItem('userGlobalVolume');
   // 刷新浏览器
   location.reload();
 };
@@ -45,7 +49,29 @@ const initLocalAudio = async () => {
 
 // 创建 PeerConnection
 const createPeerConnection = () => {
-  const pc = new RTCPeerConnection();
+  const configuration = {
+    iceServers: [
+      {
+        urls: ["stun:stun.l.google.com:19302"]
+      },
+      {
+        urls: 'stun:stun.qq.com:3478' // 腾讯云 STUN 服务器
+      },
+      // { urls: 'stun:stun.163.com:3478' },        // 网易
+      // { urls: 'stun:stun.aliyun.com:3478' },     // 阿里云（非官方，测试可用性）
+      {
+        urls: ["turn:43.133.182.165:3478?transport=udp"],
+        username: "webrtc",
+        credential: "3244228202"
+      },
+      {
+        urls: ["turn:43.133.182.165:3478?transport=tcp"],
+        username: "webrtc",
+        credential: "3244228202"
+      }
+    ]
+  };
+  const pc = new RTCPeerConnection(configuration);
 
   // 监听 ICE 候选
   pc.onicecandidate = (event) => {
@@ -105,7 +131,7 @@ const startCall = async () => {
   await peerConnection.setLocalDescription(offer);
   console.log('Offer SDP:', offer.sdp);
 
-  remoteAudio.value.srcObject = stream;
+  // remoteAudio.value.srcObject = stream;  本地播放用于测试音频是否正常获取会阻断主叫方会听不见被叫方
 
   sendMessageStandard('offer', {
     sourceUserId: currentUserId.value,
@@ -147,22 +173,6 @@ const muteCall = () => {
   isMuted.value = !isMuted.value;
 };
 
-// 调试监听本地音频
-const handerListen = async () => {
-  const stream = await initLocalAudio();
-  if (remoteAudio.value && stream) {
-    remoteAudio.value.srcObject = stream;
-  }
-};
-const testGetUserViews = () => {
-  testGetOnlineUserViews().then((res) => {
-    console.log('🚀 onlineUserRes:', res);
-  });
-}
-
-// watch(onlineUserRes,  (newValue) => {
-//   console.log('🚀 onlineUserRes:', newValue);
-// });
 
 
 // 初始化信令通道和事件
@@ -178,7 +188,9 @@ onMounted(async () => {
  // });
 
   intervalUserTimer.value = setInterval(async () => {
-    onlineUserRes.value = await testGetOnlineUserViews();
+
+      onlineUserRes.value = await testGetOnlineUserViews();
+
     // console.log('🚀 onlineUserRes:', onlineUserRes.value);
     if (onlineUserRes.value.data.data.userViews){
       const userViews = onlineUserRes.value.data.data.userViews;

@@ -119,14 +119,19 @@ function handleSubmit() {
         nickname: form.nickname,
       };
       // 校验通过发送请求接口
-      register(payload).then(res => {
-        console.log('注册响应：',res)
+      register(payload).then(async res => {
+        console.log('注册响应：',res);
         // res.status为200系列即可跳转
         if (res.status >= 200 && res.status < 300){
-          router.push('/');
+          await router.push('/');
         }
       }).catch(err => {
         console.log(err);
+        if (err.response.data.message){
+          alert(err.response.data.message);
+        }else {
+          alert(err.message);
+        }
       });
     }
   }else {
@@ -134,12 +139,17 @@ function handleSubmit() {
       login({
         mobile: fullPhone,
         password: form.password,
-      }).then(res => {
+      }).then(async res => {
         if (res.status === 200){
-          router.push('/');
+         await router.push('/');
         }
       }).catch(err => {
         console.error(err);
+        if (err.response.data.message){
+          alert(err.response.data.message);
+        }else {
+          alert(err.message);
+        }
       });
     }
   }

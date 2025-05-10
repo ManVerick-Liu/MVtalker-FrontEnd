@@ -35,25 +35,26 @@ router.beforeEach(async (to, from, next) => {
     return next();
   }
 
-  // try {
-  //  if (!token?.trim()){
-  //    next('/login');
-  //  }else {
-  //    const res = await getUserStatus();
-  //    const status = res?.data?.data?.userStatus.onlineStatus;
-  //    console.log('status', status);
-  //    if (status === 'ONLINE') {
-  //      console.log('用户在线')
-  //      next();
-  //    } else {
-  //      console.log('用户不在线')
-  //      next('/login');
-  //    }
-  //  }
-  // } catch (err) {
-  //   console.error('获取用户状态失败:', err);
-  //   next('/login');
-  // }
+  try {
+   if (!token?.trim()){
+     next('/login');
+   }
+   // else {
+   //   const res = await getUserStatus();
+   //   const status = res?.data?.data?.userStatus.onlineStatus;
+   //   console.log('status', status);
+   //   if (status === 'ONLINE') {
+   //     console.log('用户在线')
+   //     next();
+   //   } else {
+   //     console.log('用户不在线')
+   //     next('/login');
+   //   }
+   // }
+  } catch (err) {
+    console.error('获取用户状态失败:', err);
+    next('/login');
+  }
   next();
 });
 

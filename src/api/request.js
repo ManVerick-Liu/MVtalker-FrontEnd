@@ -2,7 +2,7 @@
 import axios from 'axios'
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 // axios.defaults.baseURL = '/api';
-axios.defaults.baseURL = 'http://mk-api.cavalry.gx.cn';
+axios.defaults.baseURL = 'https://mk-api.cavalry.gx.cn';
 console.log('apiBaseUrl', baseUrl);
 // axios.defaults.baseURL = baseUrl;
 axios.defaults.timeout = 100000;
@@ -18,6 +18,8 @@ export const instance = axios.create({});
 instance.interceptors.request.use(
     config => {
         // console.log(config);
+        // 加上最新的token
+        config.headers.Authorization = `Bearer ${localStorage.getItem('token')}`;
         return config;
     },
     error => {
