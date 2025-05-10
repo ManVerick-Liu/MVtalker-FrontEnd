@@ -32,7 +32,7 @@ export function connectSignalingServer(serverPath = '/webrtc/signaling') {
         console.log(event);
         console.log("📩 收到消息:", eventData);
         // 可选：解析 JSON 消息并处理
-        // 处理心跳类型
+        // TODO:处理心跳类型
         if (eventData.type === 'heartbeat'){
             eventData.data.message = 'PONG';
             sendMessage('heartbeat', eventData.data);

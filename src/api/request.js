@@ -2,10 +2,10 @@
 import axios from 'axios'
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 // axios.defaults.baseURL = '/api';
-// axios.defaults.baseURL = 'http://mk-api.cavalry.gx.cn';
+axios.defaults.baseURL = 'http://mk-api.cavalry.gx.cn';
 console.log('apiBaseUrl', baseUrl);
-axios.defaults.baseURL = baseUrl;
-axios.defaults.timeout = 10000;
+// axios.defaults.baseURL = baseUrl;
+axios.defaults.timeout = 100000;
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 // 设定请求头TOKEN
 axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
@@ -17,7 +17,7 @@ export const instance = axios.create({});
 // 请求拦截
 instance.interceptors.request.use(
     config => {
-        console.log(config);
+        // console.log(config);
         return config;
     },
     error => {

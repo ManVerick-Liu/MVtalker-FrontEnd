@@ -1,6 +1,6 @@
 <script setup>
 import exitIcon from '@/assets/ic--baseline-exit-to-app.svg';
-import {ref, onMounted, nextTick, watch} from 'vue';
+import {ref, onMounted, nextTick, watch, onUnmounted} from 'vue';
 import {useRouter} from 'vue-router';
 import {connectSignalingServer, onMessage, sendMessageStandard} from '@/api/websocket';
 import {testGetOnlineUserViews} from "@/api/UserService/test";
@@ -13,6 +13,8 @@ const isMuted = ref(false);
 const targetUserIdList = ref([]);
 const currentUserId = ref('');
 const targetUserId = ref('');
+const onlineUserRes = ref({});
+const intervalUserTimer = ref(null);
 
 let localStream = null;
 let peerConnection = null;
@@ -25,6 +27,8 @@ const outLogin = async () => {
   console.log('✅ 退出登录成功');
   alert('✅ 退出登录成功');
   await router.push('/login');
+  // 刷新浏览器
+  location.reload();
 };
 
 // 封装媒体初始化逻辑
@@ -150,6 +154,16 @@ const handerListen = async () => {
     remoteAudio.value.srcObject = stream;
   }
 };
+const testGetUserViews = () => {
+  testGetOnlineUserViews().then((res) => {
+    console.log('🚀 onlineUserRes:', res);
+  });
+}
+
+// watch(onlineUserRes,  (newValue) => {
+//   console.log('🚀 onlineUserRes:', newValue);
+// });
+
 
 // 初始化信令通道和事件
 onMounted(async () => {
@@ -157,13 +171,32 @@ onMounted(async () => {
   const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
   currentUserId.value = userInfo.userId;
 
-  const onlineUserRes = await testGetOnlineUserViews();
-  targetUserIdList.value = onlineUserRes.data.data.userViews;
+  // 改进通用定时器请求在mixin.js
+ // await intervalRequest(testGetOnlineUserViews(), 5000).then((res) => {
+ //   onlineUserRes.value = res.request;
+ //   intervalUserTimer.value = res.timer;
+ // });
+
+  intervalUserTimer.value = setInterval(async () => {
+    onlineUserRes.value = await testGetOnlineUserViews();
+    // console.log('🚀 onlineUserRes:', onlineUserRes.value);
+    if (onlineUserRes.value.data.data.userViews){
+      const userViews = onlineUserRes.value.data.data.userViews;
+      targetUserIdList.value = userViews.filter(userView => userView.userId !== currentUserId.value);
+      console.log('🚀 targetUserIdList.value:', targetUserIdList.value)
+    }else {
+      targetUserIdList.value = [];
+      clearInterval(intervalUserTimer.value);
+    }
+
+  }, 1000);
+
 
   // mk-ws.cavalry.gx.cn
   const baseWebsocketUrl = import.meta.env.VITE_API_PROXY_WEBSOCKET;
   console.log('🚀 baseWebsocketUrl:', baseWebsocketUrl);
   await connectSignalingServer(baseWebsocketUrl + `?token=${token}`);
+
 
   // 📥 被叫方收到 offer
   await onMessage('offer', async (offer) => {
@@ -216,6 +249,7 @@ onMounted(async () => {
       }
     }
   });
+  // await intervalRequest(testGetOnlineUserViews(), 5000);
   remoteAudio.value.onplay = () => {
     console.log('音频正在播放');
   };
@@ -224,7 +258,9 @@ onMounted(async () => {
   };
 });
 
-;
+onUnmounted(()=>{
+  clearInterval(intervalUserTimer.value);
+});
 </script>
 
 
@@ -237,6 +273,7 @@ onMounted(async () => {
       <button @click="startCall" :disabled="isCalling">🎤 开始通话</button>
       <button @click="hangUp" :disabled="!isCalling">☎️ 挂断</button>
       <button class="controls-button" @click="muteCall" :class="{'selected': isMuted.value}">⏸️ 静音</button>
+<!--      <button class="controls-button" @click="testGetUserViews">刷新视图</button>-->
 <!--      TODO: 添加静音功能-->
 <!--      <button @click="handerListen">🎤 麦克风监听</button>-->
       <audio ref="remoteAudio" autoplay playsinline ></audio>

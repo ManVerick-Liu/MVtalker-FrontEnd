@@ -7,7 +7,7 @@ export const testGetOnlineUserViews = () => {
         instance({
             url: '/user/test/get-online-user-views',
             method: 'get',
-            timeout: 50000
+            timeout: 100000
         }).then(res => {
             resolve(res);
         }).catch(err => {
